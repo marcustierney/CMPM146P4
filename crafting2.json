@@ -1,0 +1,15 @@
+{
+  "Problem": {
+    "Time": 10,
+    "Initial": {},
+    "Goal": {"wood": 1}
+  },
+  "Items": ["wood"],
+  "Tools": [],
+  "Recipes": {
+    "punch_for_wood": {
+      "Produces": {"wood": 1},
+      "Time": 1
+    }
+  }
+}

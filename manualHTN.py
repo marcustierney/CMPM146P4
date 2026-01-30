@@ -129,5 +129,5 @@ state.bench = {'agent': 0}
 # pyhop.print_operators()
 # pyhop.print_methods()
 
-# pyhop.pyhop(state, [('have_enough', 'agent', 'wood', 1)], verbose=3)
+pyhop.pyhop(state, [('have_enough', 'agent', 'wood', 1)], verbose=3)
 pyhop.pyhop(state, [('have_enough', 'agent', 'wood', 12)], verbose=3)
