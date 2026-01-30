@@ -16,19 +16,37 @@ def produce(state, ID, item):
 pyhop.declare_methods('produce', produce)
 
 def make_method(name, rule):
-	def method(state, ID):
-		# your code here
-		pass
+    time_cost = rule.get("Time", 0)
+    requires = rule.get("Requires", {})
+    consumes = rule.get("Consumes", {})
+    def method(state, ID):
+        subtasks = []
+        for item, qty in requires.items():
+            subtasks.append(('have_enough', ID, item, qty))
 
-	return method
+        for item, qty in consumes.items():
+            subtasks.append(('have_enough', ID, item, qty))
+
+        subtasks.append(('op_' + name.replace(" ", "_"), ID))
+        return subtasks
+    method.time_cost = time_cost
+    method.__name__ = "method_" + name.replace(" ", "_")
+    return method
 
 def declare_methods(data):
-	# some recipes are faster than others for the same product even though they might require extra tools
-	# sort the recipes so that faster recipes go first
-
-	# your code here
-	# hint: call make_method, then declare the method to pyhop using pyhop.declare_methods('foo', m1, m2, ..., mk)	
-	pass			
+    recipes = data["Recipes"]
+    methods_by_product = {}  
+    for recipe_name, rule in recipes.items():
+        produces = rule.get("Produces", {})
+        method = make_method(recipe_name, rule)
+        for item in produces:
+            if item not in methods_by_product:
+                methods_by_product[item] = []  
+            methods_by_product[item].append(method)
+    #register methods with pyhop
+    for item, methods in methods_by_product.items():
+        task_name = "produce_" + item
+        pyhop.declare_methods(task_name, *methods)
 
 def make_operator(rule):
     produces = rule.get("Produces", {})
@@ -86,7 +104,7 @@ def define_ordering(data, ID):
 	# if needed, use the function below to return a different ordering for the methods
 	# note that this should always return the same methods, in a new order, and should not add/remove any new ones
 	def reorder_methods(state, curr_task, tasks, plan, depth, calling_stack, methods):
-		return methods
+		return sorted(methods, key=lambda m: getattr(m, 'time_cost', 0))
 	
 	pyhop.define_ordering(reorder_methods)
 
