@@ -130,19 +130,6 @@ def set_up_goals(data, ID):
 
 	return goals
 
-def run_test(initial_items, goal_items, time_limit, verbose=1):
-    agent_id = 'agent'
-    test_state = pyhop.State('state')
-    test_state.time = {agent_id: time_limit}
-    for item in data['Items'] + data['Tools']:
-        setattr(test_state, item, {agent_id: 0})
-    for item, qty in initial_items.items():
-        getattr(test_state, item)[agent_id] = qty
-    test_goals = [('have_enough', agent_id, item, qty) for item, qty in goal_items.items()]
-    print(f"\n--- Testing Goal: {goal_items}, Initial: {initial_items}, Time <= {time_limit} ---")
-    plan = pyhop.pyhop(test_state, test_goals, verbose=verbose)
-    print("Plan result:", plan)
-
 if __name__ == '__main__':
 	import sys
 	rules_filename = 'crafting.json'
@@ -168,30 +155,5 @@ if __name__ == '__main__':
 	pyhop.pyhop(state, goals, verbose=1)
 	#pyhop.pyhop(state, [('have_enough', 'agent', 'cart', 1),('have_enough', 'agent', 'rail', 20)], verbose=3)
 	#pyhop.print_operators()
-    
-	#Tester
-	test_cases = [
-        ({'plank': 1}, {'plank': 1}, 0),
-        ({}, {'plank': 1}, 300),
-        ({'plank': 3, 'stick': 2}, {'wooden_pickaxe': 1}, 10),
-        ({}, {'iron_pickaxe': 1}, 100),
-        ({}, {'cart': 1, 'rail': 10}, 175),
-        ({}, {'cart': 1, 'rail': 20}, 250),
-    ]
-	for initial, goal, time_limit in test_cases:
-		agent_id = 'agent'
-		state = pyhop.State('state')
-		state.time = {agent_id: time_limit}
-		#set all items/tools to 0
-		for item in data['Items'] + data['Tools']:
-			setattr(state, item, {agent_id: 0})
-		#set initial items
-		for item, qty in initial.items():
-			getattr(state, item)[agent_id] = qty
-		#set goals
-		goals = [('have_enough', agent_id, item, qty) for item, qty in goal.items()]
-		print(f"\ntest goal: {goal}, initial: {initial}, time limit: {time_limit}")
-		plan = pyhop.pyhop(state, goals, verbose=1)
-		print("plan result:", plan)
 
 
